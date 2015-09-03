@@ -1,0 +1,9 @@
+* {
+	font-family: tahoma, verdana, sans-serif !important;
+	font-size: 12px !important;
+}
+
+.input-message {
+	width: 400px;
+	height:50px;
+}

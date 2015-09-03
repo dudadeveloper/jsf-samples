@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<h:outputStylesheet library="css" name="style.css" />
+</h:head>
+
+<h:body>
+
+	<p:layout style="min-width:500px;min-height:500px;">
+		<p:layoutUnit header="Pessoas na Sala" position="west" resizable="true" size="300" minSize="40"
+			maxSize="200">
+			<h:form id="usersForm">
+				<p:dataTable id="usersDataTable" value="#{chatBean.users}"
+					var="user">
+					<p:column>
+						<h:outputText value="#{user.name}" />
+					</p:column>
+				</p:dataTable>
+			</h:form>
+		</p:layoutUnit>
+
+		<p:layoutUnit position="center">
+			<h:form id="chatForm">
+				<p:dataTable id="messageDataTable" value="#{chatBean.messages}"
+					var="message">
+					<p:column width="150">
+						<h:outputText value="#{message.date}">
+							<f:convertDateTime dateStyle="medium" />
+						</h:outputText>
+					</p:column>
+					<p:column width="100">
+						<h:outputText value="#{message.user.name}" />
+					</p:column>
+					<p:column>
+						<h:outputText value="#{message.message}" />
+					</p:column>
+				</p:dataTable>
+			</h:form>
+		</p:layoutUnit>
+
+		<p:layoutUnit position="south">
+			<h:form id="messageForm">
+				<p:inputText id="inputMessage" value="#{chatBean.message}" class="input-message" />
+				<p:commandButton value="Enviar" action="#{chatBean.send}"
+					update=":chatForm:messageDataTable :messageForm:inputMessage" />
+			</h:form>
+		</p:layoutUnit>
+	</p:layout>
+
+	<h:form id="dialogForm">
+		<p:dialog visible="#{empty userSessionBean.user.name}" modal="true"
+			header="Entre no Chat">
+			<p:messages id="messages" autoUpdate="true" />
+			<h:panelGrid columns="2">
+				<h:outputLabel value="Nome:" for="inputName" />
+				<p:inputText id="inputName" value="#{userSessionBean.user.name}"
+					required="true" requiredMessage="Diga seu nome, por favor!" />
+				<p:commandButton value="Entrar" action="#{chatBean.connect}"
+					update=":usersForm :chatForm: :dialogForm :messageForm" />
+			</h:panelGrid>
+		</p:dialog>
+	</h:form>
+
+	<p:socket channel="/room" autoConnect="false" widgetVar="subscriber">
+		<p:ajax update=":chatForm:messageDataTable" />
+	</p:socket>
+
+</h:body>
+</html>
